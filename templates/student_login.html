@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Student Login | Campus Safety Incident Logger</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="kiet-logo-badge">
+        <i class="fas fa-university"></i>
+        <span>KIET</span>
+      </div>
+      <span class="nav-title">CAMPUS SAFETY LOGGER</span>
+    </a>
+
+    <div class="nav-actions">
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+      </button>
+      <a href="/login" class="btn btn-outline btn-sm"><i class="fas fa-user-shield"></i> Admin Portal</a>
+    </div>
+  </nav>
+
+  <!-- Student Login Form Container -->
+  <main class="login-container">
+    <div class="login-card">
+      
+      <!-- Dual Login Switcher Tabs -->
+      <div style="display:flex; border:1px solid var(--border-color); border-radius:var(--radius-sm); overflow:hidden; margin-bottom:1.5rem;">
+        <a href="/student-login" style="flex:1; padding:0.6rem; text-decoration:none; color:var(--primary); font-weight:700; font-size:0.88rem; background:var(--primary-light); display:flex; align-items:center; justify-content:center; gap:0.4rem;">
+          <i class="fas fa-user-graduate"></i> Student Login
+        </a>
+        <a href="/login" style="flex:1; padding:0.6rem; text-decoration:none; color:var(--text-muted); font-weight:600; font-size:0.88rem; background:var(--bg-main); display:flex; align-items:center; justify-content:center; gap:0.4rem; border-left:1px solid var(--border-color);">
+          <i class="fas fa-user-shield"></i> Admin Login
+        </a>
+      </div>
+
+      <div class="login-logo">
+        <i class="fas fa-user-graduate"></i>
+      </div>
+      <h2 style="font-size:1.6rem; font-weight:700;">Student Portal Access</h2>
+      <p style="color:var(--text-muted); font-size:0.88rem; margin-bottom:1rem;">
+        Enter your KIET Roll Number series to log in and report campus safety incidents.
+      </p>
+
+      <!-- Roll Series Rules Note -->
+      <div class="demo-credentials-box" style="text-align:left;">
+        <strong><i class="fas fa-info-circle"></i> Roll Series Rules:</strong><br>
+        • <strong>KIET-1</strong>: <code>25B21AXXXX</code> (e.g., 25B21A0501)<br>
+        • <strong>KIET-2</strong>: <code>256Q1AXXXX</code> (e.g., 256Q1A0502)
+        <div style="display:flex; gap:0.5rem; margin-top:0.6rem;">
+          <button type="button" onclick="quickFillStudent('KIET-1')" class="btn btn-sm btn-outline" style="flex:1;">Fill KIET-1 Demo</button>
+          <button type="button" onclick="quickFillStudent('KIET-2')" class="btn btn-sm btn-outline" style="flex:1;">Fill KIET-2 Demo</button>
+        </div>
+      </div>
+
+      <form id="studentLoginForm">
+        <div class="form-group" style="text-align:left; margin-bottom:1rem;">
+          <label for="campusSelect">Select Campus *</label>
+          <select id="campusSelect" class="form-control" required onchange="updateRollPlaceholder()">
+            <option value="KIET-1">KIET-1 (25B21A Series)</option>
+            <option value="KIET-2">KIET-2 (256Q1A Series)</option>
+          </select>
+        </div>
+
+        <div class="form-group" style="text-align:left; margin-bottom:1rem;">
+          <label for="studentRoll">Roll Number *</label>
+          <input type="text" id="studentRoll" class="form-control" placeholder="e.g. 25B21A0501" maxlength="10" required style="text-transform:uppercase;">
+          <small id="rollHelpText" style="color:var(--text-muted); font-size:0.78rem;">Format: 25B21AXXXX (10 characters)</small>
+        </div>
+
+        <div class="form-group" style="text-align:left; margin-bottom:1.5rem;">
+          <label for="studentNameInput">Student Full Name *</label>
+          <input type="text" id="studentNameInput" class="form-control" placeholder="Enter your full name" required>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-lg" id="studentLoginBtn" style="width:100%;">
+          <i class="fas fa-sign-in-alt"></i> Login & Continue to Report
+        </button>
+      </form>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      &copy; <span id="currentYear">2026</span> Campus Safety Incident Logger • KIET Group of Institutions. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/script.js"></script>
+  <script>
+    function updateRollPlaceholder() {
+      const campus = document.getElementById('campusSelect').value;
+      const rollInput = document.getElementById('studentRoll');
+      const help = document.getElementById('rollHelpText');
+      if (campus === 'KIET-1') {
+        rollInput.placeholder = 'e.g. 25B21A0501';
+        help.textContent = 'Format: 25B21AXXXX (10 characters for KIET-1)';
+      } else {
+        rollInput.placeholder = 'e.g. 256Q1A0502';
+        help.textContent = 'Format: 256Q1AXXXX (10 characters for KIET-2)';
+      }
+    }
+
+    function quickFillStudent(campus) {
+      document.getElementById('campusSelect').value = campus;
+      updateRollPlaceholder();
+      if (campus === 'KIET-1') {
+        document.getElementById('studentRoll').value = '25B21A0501';
+        document.getElementById('studentNameInput').value = 'Rahul Sharma';
+      } else {
+        document.getElementById('studentRoll').value = '256Q1A0502';
+        document.getElementById('studentNameInput').value = 'Vikram Reddy';
+      }
+      showToast(`${campus} demo credentials loaded!`, 'info');
+    }
+
+    document.getElementById('studentLoginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const campus = document.getElementById('campusSelect').value;
+      const roll_number = document.getElementById('studentRoll').value.trim().toUpperCase();
+      const student_name = document.getElementById('studentNameInput').value.trim();
+
+      const btn = document.getElementById('studentLoginBtn');
+      const orig = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Validating Roll Number...';
+
+      try {
+        const res = await fetch('/api/student-login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ campus, roll_number, student_name })
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(result.message, 'success');
+          setTimeout(() => {
+            window.location.href = '/report';
+          }, 600);
+        } else {
+          showToast(result.message || 'Invalid Roll Number format.', 'danger');
+        }
+      } catch(err) {
+        showToast('Network error during student login.', 'danger');
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = orig;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard | Campus Safety Incident Logger</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="nav-logo-icon"><i class="fas fa-shield-alt"></i></div>
+      <span class="nav-title">CAMPUS SAFETY LOGGER</span>
+    </a>
+    
+    <ul class="nav-menu">
+      <li><a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/report" class="nav-link"><i class="fas fa-plus-circle"></i> New Report</a></li>
+      <li><a href="/dashboard" class="nav-link active"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="logoutAdmin()"><i class="fas fa-sign-out-alt"></i> Logout</button>
+    </div>
+  </nav>
+
+  <!-- Dashboard Layout: Sidebar + Main Content -->
+  <div class="dashboard-layout">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-heading">Main Navigation</div>
+      <a href="#statsOverview" class="sidebar-nav-item active"><i class="fas fa-tachometer-alt"></i> Overview</a>
+      <a href="#analyticsSection" class="sidebar-nav-item"><i class="fas fa-chart-pie"></i> Analytics & Charts</a>
+      <a href="#incidentsTableSection" class="sidebar-nav-item"><i class="fas fa-list-alt"></i> Incident Records</a>
+      
+      <div class="sidebar-heading">Data Export</div>
+      <button onclick="exportToCSV()" class="sidebar-nav-item" style="background:none; border:none; width:100%; text-align:left; cursor:pointer;">
+        <i class="fas fa-file-excel"></i> Export to CSV / Excel
+      </button>
+      <button onclick="window.print()" class="sidebar-nav-item" style="background:none; border:none; width:100%; text-align:left; cursor:pointer;">
+        <i class="fas fa-file-pdf"></i> Print / PDF Export
+      </button>
+    </aside>
+
+    <!-- Main Content Panel -->
+    <main class="dashboard-main">
+      
+      <!-- Top Header & Actions -->
+      <div class="dashboard-header-bar">
+        <div>
+          <h2 style="font-size:1.8rem; font-weight:800;">Campus Incident Command Center</h2>
+          <p style="color:var(--text-muted); font-size:0.9rem;">Real-time AI monitoring, trend analytics & dispatch management.</p>
+        </div>
+        <div style="display:flex; gap:0.75rem;">
+          <button class="btn btn-secondary btn-sm" onclick="exportToCSV()"><i class="fas fa-download"></i> Export CSV</button>
+          <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print Report</button>
+        </div>
+      </div>
+
+      <!-- Critical Alert Container -->
+      <div id="criticalAlertContainer"></div>
+
+      <!-- Top KPI Statistics Cards -->
+      <section id="statsOverview" class="stats-cards-grid">
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-clipboard-list"></i></div>
+          <div class="stat-info">
+            <h3 id="statTotal">0</h3>
+            <p>Total Reports</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon red"><i class="fas fa-exclamation-triangle"></i></div>
+          <div class="stat-info">
+            <h3 id="statHigh">0</h3>
+            <p>High Priority</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
+          <div class="stat-info">
+            <h3 id="statResolved">0</h3>
+            <p>Resolved Reports</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-clock"></i></div>
+          <div class="stat-info">
+            <h3 id="statPending">0</h3>
+            <p>Pending Review</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon blue"><i class="fas fa-map-marker-alt"></i></div>
+          <div class="stat-info">
+            <h3 id="statLocation" style="font-size:1.2rem;">-</h3>
+            <p>Most Affected Location</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon yellow"><i class="fas fa-fire"></i></div>
+          <div class="stat-info">
+            <h3 id="statIncident" style="font-size:1.2rem;">-</h3>
+            <p>Most Common Incident</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Analytics & Chart.js Grid -->
+      <section id="analyticsSection" class="charts-grid">
+        <!-- Chart 1: Monthly Trends -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-chart-bar" style="color:var(--primary);"></i> Monthly Incident Trends</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartMonthly"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 2: Weekly Line Chart -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-chart-line" style="color:var(--success);"></i> Weekly Reports</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartWeekly"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 3: Reports by Branch -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-chart-pie" style="color:var(--warning);"></i> Reports by Branch</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartBranch"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 4: Incident Categories -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-doughnut-chart" style="color:var(--info);"></i> Incident Categories</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartCategory"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 5: Most Affected Locations -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-map-marked-alt" style="color:var(--primary);"></i> Affected Locations</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartLocation"></canvas>
+          </div>
+        </div>
+
+        <!-- Chart 6: Priority Distribution -->
+        <div class="chart-card">
+          <div class="chart-card-header">
+            <h3><i class="fas fa-layer-group" style="color:var(--danger);"></i> Priority Distribution</h3>
+          </div>
+          <div class="chart-wrapper">
+            <canvas id="chartPriority"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Incident Table Section -->
+      <section id="incidentsTableSection" class="table-container-card">
+        <div class="table-toolbar">
+          <h3 style="font-size:1.25rem;"><i class="fas fa-table" style="color:var(--primary);"></i> Incident Management Directory</h3>
+
+          <div style="display:flex; gap:0.75rem; flex-wrap:wrap;">
+            <!-- Search Bar -->
+            <div class="search-input-wrapper">
+              <i class="fas fa-search"></i>
+              <input type="text" id="tableSearchInput" class="form-control" placeholder="Search Roll, Name, Location, Type...">
+            </div>
+
+            <!-- Status Filter -->
+            <select id="statusFilterSelect" class="form-control" style="width:auto;">
+              <option value="">All Statuses</option>
+              <option value="Submitted">Submitted</option>
+              <option value="Under Review">Under Review</option>
+              <option value="Assigned">Assigned</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+
+            <!-- Priority Filter -->
+            <select id="priorityFilterSelect" class="form-control" style="width:auto;">
+              <option value="">All Priorities</option>
+              <option value="Urgent">Urgent</option>
+              <option value="High">High</option>
+              <option value="Medium">Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Table Responsive -->
+        <div class="table-responsive">
+          <table class="custom-table">
+            <thead>
+              <tr>
+                <th>Report ID</th>
+                <th>Roll No</th>
+                <th>Student Name</th>
+                <th>Branch</th>
+                <th>Location</th>
+                <th>Incident Type</th>
+                <th>AI Category</th>
+                <th>Risk</th>
+                <th>Priority</th>
+                <th>Status</th>
+                <th>Date</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="incidentTableBody">
+              <!-- Rendered via JS -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Incident Details Modal -->
+  <div class="modal-backdrop" id="reportDetailModal">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h4 style="font-size:1.2rem; font-weight:700;"><i class="fas fa-shield-alt" style="color:var(--primary);"></i> Incident Report Details</h4>
+        <button class="close-modal-btn" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body" id="modalDetailBody">
+        <!-- Rendered via JS -->
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary btn-sm" onclick="closeModal()">Close</button>
+        <button class="btn btn-primary btn-sm" onclick="window.print()"><i class="fas fa-print"></i> Print Details</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="/static/js/script.js"></script>
+  <script src="/static/js/dashboard.js"></script>
+  <script src="/static/js/login.js"></script>
+</body>
+</html>

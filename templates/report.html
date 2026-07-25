@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Report Incident | Campus Safety Incident Logger</title>
+  
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a href="/" class="nav-brand">
+      <div class="nav-logo-icon"><i class="fas fa-shield-alt"></i></div>
+      <span class="nav-title">CAMPUS SAFETY LOGGER</span>
+    </a>
+    
+    <ul class="nav-menu">
+      <li><a href="/" class="nav-link"><i class="fas fa-home"></i> Home</a></li>
+      <li><a href="/report" class="nav-link active"><i class="fas fa-exclamation-triangle"></i> Report Incident</a></li>
+      <li><a href="/dashboard" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+    </ul>
+
+    <div class="nav-actions">
+      <button class="theme-toggle-btn" id="themeToggleBtn" title="Toggle Theme">
+        <i class="fas fa-moon"></i>
+      </button>
+      <button class="btn btn-outline btn-sm" onclick="logoutStudent()"><i class="fas fa-sign-out-alt"></i> Student Logout</button>
+    </div>
+  </nav>
+
+  <!-- Report Form Container -->
+  <main class="form-page-container">
+    
+    <!-- Logged in Student Info Banner -->
+    <div class="card" style="margin-bottom:1.5rem; background:var(--primary-light); border-color:var(--primary); display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:1rem;">
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <i class="fas fa-user-check" style="font-size:1.5rem; color:var(--primary);"></i>
+        <div>
+          <strong id="sessionStudentName" style="font-size:1.05rem;">Student Logged In</strong>
+          <div style="font-size:0.85rem; color:var(--text-muted);">
+            Roll Series: <code id="sessionRollNumber" style="font-weight:700;">Loading...</code> | Campus: <span id="sessionCampus" class="badge badge-info">Loading...</span>
+          </div>
+        </div>
+      </div>
+      <button class="btn btn-sm btn-secondary" onclick="logoutStudent()"><i class="fas fa-user-times"></i> Switch Student</button>
+    </div>
+
+    <div class="form-card">
+      <div class="form-header">
+        <h2><i class="fas fa-file-medical-alt" style="color:var(--primary);"></i> Student Incident Report Form</h2>
+        <p>Submit campus safety concerns or equipment hazards for immediate AI evaluation and administrative resolution.</p>
+      </div>
+
+      <form id="incidentForm" enctype="multipart/form-data">
+        <input type="hidden" id="formCampus" name="campus" value="KIET-1">
+        
+        <!-- Section 1: Student Information -->
+        <div class="form-section-title">
+          <i class="fas fa-user-graduate"></i> Student Identification & Department
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="rollNumber">Roll Number *</label>
+            <input type="text" id="rollNumber" name="roll_number" class="form-control" placeholder="e.g. 25B21A0501" required readonly style="background:var(--border-color); cursor:not-allowed;">
+          </div>
+
+          <div class="form-group">
+            <label for="studentName">Student Name *</label>
+            <input type="text" id="studentName" name="student_name" class="form-control" placeholder="e.g. Rahul Sharma" required readonly style="background:var(--border-color); cursor:not-allowed;">
+          </div>
+
+          <div class="form-group">
+            <label for="branch">Department / Branch (CSE Allied) *</label>
+            <select id="branch" name="branch" class="form-control" required>
+              <option value="">-- Select Allied CSE Branch --</option>
+              {% for b in cse_branches %}
+                <option value="{{ b }}">{{ b }}</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="year">Year of Study *</label>
+            <select id="year" name="year" class="form-control" required>
+              <option value="">-- Select Year --</option>
+              <option value="1st">1st Year</option>
+              <option value="2nd">2nd Year</option>
+              <option value="3rd">3rd Year</option>
+              <option value="4th">4th Year</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="mobile">Mobile Contact Number *</label>
+            <input type="tel" id="mobile" name="mobile" class="form-control" placeholder="e.g. 9876543210 (10 digits)" required>
+          </div>
+        </div>
+
+        <!-- Section 2: Incident Details -->
+        <div class="form-section-title">
+          <i class="fas fa-map-marker-alt"></i> Incident Parameters & Location
+        </div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="incidentDate">Incident Date *</label>
+            <input type="date" id="incidentDate" name="incident_date" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="incidentTime">Incident Time *</label>
+            <input type="time" id="incidentTime" name="incident_time" class="form-control" required>
+          </div>
+
+          <div class="form-group">
+            <label for="location">Place of Incident *</label>
+            <select id="location" name="location" class="form-control" required>
+              <option value="">-- Select Location --</option>
+              <option value="Hostel Block A">Hostel Block A</option>
+              <option value="Hostel Block B">Hostel Block B</option>
+              <option value="Library">Library</option>
+              <option value="Laboratory">Laboratory</option>
+              <option value="Parking Area">Parking Area</option>
+              <option value="Classroom">Classroom</option>
+              <option value="Canteen">Canteen</option>
+              <option value="Playground">Playground</option>
+              <option value="College Entrance">College Entrance</option>
+              <option value="Other">Other Location</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="incidentType">Incident Type *</label>
+            <select id="incidentType" name="incident_type" class="form-control" required>
+              <option value="">-- Select Category --</option>
+              <option value="Fire">Fire</option>
+              <option value="Water Leakage">Water Leakage</option>
+              <option value="Electrical Problem">Electrical Problem</option>
+              <option value="Medical Emergency">Medical Emergency</option>
+              <option value="Ragging">Ragging</option>
+              <option value="Theft">Theft</option>
+              <option value="Lost & Found">Lost & Found</option>
+              <option value="Suspicious Person">Suspicious Person</option>
+              <option value="Infrastructure Damage">Infrastructure Damage</option>
+              <option value="Cyber Security">Cyber Security</option>
+              <option value="Other">Other</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="severity">Perceived Severity Level *</label>
+            <select id="severity" name="severity" class="form-control" required>
+              <option value="Low">Low - Minor issue, no immediate danger</option>
+              <option value="Medium" selected>Medium - Moderate hazard requiring attention</option>
+              <option value="High">High - Severe threat to property or personal safety</option>
+              <option value="Critical">Critical - Urgent active emergency requiring immediate dispatch</option>
+            </select>
+          </div>
+
+          <div class="form-group full-width">
+            <label for="description">Problem Description *</label>
+            <textarea id="description" name="description" class="form-control" placeholder="Describe what happened, exact room number/spot, and any visible risks..." required></textarea>
+          </div>
+
+          <!-- Photo Upload with Live Preview -->
+          <div class="form-group full-width">
+            <label>Upload Incident Photo Evidence (Optional)</label>
+            <div class="image-upload-wrapper" id="imageUploadWrapper" onclick="document.getElementById('incidentPhoto').click()">
+              <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
+              <div class="upload-text">Click to choose image or drag file here</div>
+              <div style="font-size:0.75rem; color:var(--text-muted); margin-top:0.25rem;">Supports JPG, PNG, GIF up to 5MB</div>
+              <input type="file" id="incidentPhoto" name="photo" accept="image/*" style="display:none;">
+              <img id="photoPreview" alt="Incident Preview">
+            </div>
+          </div>
+        </div>
+
+        <!-- Confirmation Checkbox -->
+        <label class="checkbox-group">
+          <input type="checkbox" id="confirmCheck" required>
+          <span>I confirm that the information provided is accurate and true to the best of my knowledge.</span>
+        </label>
+
+        <!-- Submit Button -->
+        <button type="submit" class="btn btn-primary btn-lg" id="submitBtn" style="width:100%;">
+          <i class="fas fa-shield-alt"></i> Submit Incident & Run AI Analysis
+        </button>
+
+      </form>
+    </div>
+
+    <!-- AI Analysis Card Result Container -->
+    <div id="aiResultContainer"></div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-bottom">
+      &copy; <span id="currentYear">2026</span> Campus Safety Incident Logger. All rights reserved.
+    </div>
+  </footer>
+
+  <!-- Scripts -->
+  <script src="/static/js/script.js"></script>
+  <script src="/static/js/report.js"></script>
+  <script>
+    // Fetch logged-in student session details
+    document.addEventListener('DOMContentLoaded', async () => {
+      try {
+        const res = await fetch('/api/student-session');
+        const sessionData = await res.json();
+        if (sessionData.logged_in) {
+          document.getElementById('rollNumber').value = sessionData.roll_number;
+          document.getElementById('studentName').value = sessionData.student_name;
+          document.getElementById('formCampus').value = sessionData.campus;
+          
+          document.getElementById('sessionRollNumber').textContent = sessionData.roll_number;
+          document.getElementById('sessionStudentName').textContent = sessionData.student_name;
+          document.getElementById('sessionCampus').textContent = sessionData.campus;
+        } else {
+          window.location.href = '/student-login';
+        }
+      } catch (e) {
+        console.error('Error fetching session:', e);
+      }
+    });
+
+    async function logoutStudent() {
+      await fetch('/api/student-logout', { method: 'POST' });
+      showToast('Student logged out.', 'info');
+      setTimeout(() => {
+        window.location.href = '/student-login';
+      }, 400);
+    }
+  </script>
+</body>
+</html>
