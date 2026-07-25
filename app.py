@@ -18,6 +18,12 @@ from werkzeug.utils import secure_filename
 app = Flask(__name__)
 app.secret_key = 'campus_safety_secret_key_2026_antigravity'
 
+# Session Configuration (for cloud deployment)
+app.config['SESSION_COOKIE_SECURE'] = True
+app.config['SESSION_COOKIE_HTTPONLY'] = True
+app.config['SESSION_COOKIE_SAMESITE'] = 'Lax'
+app.config['PERMANENT_SESSION_LIFETIME'] = 3600
+
 # Configuration
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 DATA_FILE = os.path.join(BASE_DIR, 'data.json')
