@@ -675,7 +675,8 @@ def api_get_stats():
 if __name__ == '__main__':
     print("=========================================================")
     print(" CAMPUS SAFETY INCIDENT LOGGER - Server Starting")
-    print(" Running on http://127.0.0.1:5000")
+    print(" Running on http://0.0.0.0:5000")
     print(" Branches: CSE, CSE(AI&DS), CSE(AI&ML), CAI, CSD, CSM")
     print("=========================================================")
-    app.run(debug=True, host='127.0.0.1', port=5000)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
